@@ -1,6 +1,5 @@
 package com.nokhoon.couchstairs;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -27,9 +26,9 @@ public class PluginMain extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		task = Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+		task = getServer().getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
-				for(Player player : Bukkit.getOnlinePlayers()) {
+				for(Player player : getServer().getOnlinePlayers()) {
 					if(player.isInsideVehicle()) {
 						Entity vehicle = player.getVehicle();
 						if(vehicle.getType() == EntityType.ARROW) vehicle.setTicksLived(1);
@@ -37,7 +36,7 @@ public class PluginMain extends JavaPlugin implements Listener {
 				}
 			}
 		}, 1111L, 1111L);
-		Bukkit.getPluginManager().registerEvents(this, this);
+		getServer().getPluginManager().registerEvents(this, this);
 	}
 	
 	@Override
