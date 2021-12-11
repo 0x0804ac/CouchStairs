@@ -1,6 +1,6 @@
 name: CouchStairs
-version: "1.3"
+version: "1.4"
 main: com.nokhoon.couchstairs.PluginMain
 description: right-click a block of stairs to sit on it
-api-version: 1.17
+api-version: 1.18
 author: "0x0804ac"
