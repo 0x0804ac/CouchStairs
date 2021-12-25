@@ -1,6 +1,7 @@
 package com.nokhoon.couchstairs;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -49,10 +51,12 @@ public class PluginMain extends JavaPlugin implements Listener {
 	public void sitOnStairs(PlayerInteractEvent event) {
 		if(!event.hasBlock()) return;
 		Player player = event.getPlayer();
-		if(player.isInsideVehicle() || player.isSneaking()) return;
+		if(player.isInsideVehicle() || player.isSneaking() || ((Entity) player).isOnGround()) return;
 		GameMode gamemode = player.getGameMode();
 		if(gamemode != GameMode.SURVIVAL && gamemode != GameMode.CREATIVE) return;
 		if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if(!EquipmentSlot.HAND.equals(event.getHand())
+				|| player.getInventory().getItemInMainHand().getType() != Material.AIR) return;
 		if(event.getBlockFace() == BlockFace.DOWN) return;
 		Block block = event.getClickedBlock();
 		if(!Tag.STAIRS.isTagged(block.getType())) return;
