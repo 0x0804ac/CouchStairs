@@ -47,7 +47,7 @@ public class PluginMain extends JavaPlugin implements Listener {
 		task = null;
 	}
 	
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler
 	public void sitOnStairs(PlayerInteractEvent event) {
 		if(!event.hasBlock()) return;
 		Player player = event.getPlayer();
