@@ -60,13 +60,16 @@ public class PluginMain extends JavaPlugin implements Listener {
 		Stairs stairs = (Stairs) block.getBlockData();
 		if(stairs.getShape() != Shape.STRAIGHT || stairs.getHalf() == Half.TOP || stairs.isWaterlogged()) return;
 		if(!block.getRelative(BlockFace.UP).isPassable() || !block.getRelative(BlockFace.UP, 2).isPassable()) return;
-		event.setCancelled(true);
 		Vector direction = stairs.getFacing().getDirection().multiply(0.3);
 		direction.setY(0.5);
-		Arrow arrow = player.getWorld().spawnArrow(block.getLocation().toCenterLocation().subtract(direction), direction, 0, 0);
-		arrow.setPickupStatus(PickupStatus.DISALLOWED);
-		arrow.getLocation().setDirection(direction);
-		arrow.addPassenger(player);
+		var blockCenter = block.getLocation().toCenterLocation();
+		if(blockCenter.getWorld().getNearbyEntitiesByType(Arrow.class, blockCenter, 0.5).isEmpty()) {
+			event.setCancelled(true);
+			Arrow arrow = player.getWorld().spawnArrow(blockCenter.subtract(direction), direction, 0F, 0F);
+			arrow.setPickupStatus(PickupStatus.DISALLOWED);
+			arrow.getLocation().setDirection(direction);
+			arrow.addPassenger(player);
+		}
 	}
 	
 	@EventHandler
