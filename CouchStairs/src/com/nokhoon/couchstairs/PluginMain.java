@@ -31,7 +31,10 @@ public class PluginMain extends JavaPlugin implements Listener {
 				for(Player player : getServer().getOnlinePlayers()) {
 					if(player.isInsideVehicle()) {
 						Entity vehicle = player.getVehicle();
-						if(vehicle.getType() == EntityType.ARROW) vehicle.setTicksLived(1);
+						if(vehicle.getType() == EntityType.ARROW) {
+							Arrow arrow = (Arrow) vehicle;
+							if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) arrow.setTicksLived(1);
+						}
 					}
 				}
 			}
@@ -77,7 +80,7 @@ public class PluginMain extends JavaPlugin implements Listener {
 		Entity vehicle = event.getDismounted();
 		if(vehicle.getType() == EntityType.ARROW) {
 			Arrow arrow = (Arrow) vehicle;
-			if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) vehicle.remove();
+			if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) arrow.remove();
 		}
 	}
 }
