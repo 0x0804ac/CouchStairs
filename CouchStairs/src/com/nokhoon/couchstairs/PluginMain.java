@@ -75,6 +75,9 @@ public class PluginMain extends JavaPlugin implements Listener {
 	@EventHandler
 	public void despawnArrow(EntityDismountEvent event) {
 		Entity vehicle = event.getDismounted();
-		if(vehicle.getType() == EntityType.ARROW) vehicle.remove();
+		if(vehicle.getType() == EntityType.ARROW) {
+			Arrow arrow = (Arrow) vehicle;
+			if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) vehicle.remove();
+		}
 	}
 }
