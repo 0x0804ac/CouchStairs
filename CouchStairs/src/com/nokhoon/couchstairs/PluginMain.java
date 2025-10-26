@@ -43,7 +43,7 @@ public class PluginMain extends JavaPlugin implements Listener {
 		if(stairs.getShape() != Shape.STRAIGHT || stairs.getHalf() == Half.TOP || stairs.isWaterlogged()) return;
 		if(!block.getRelative(BlockFace.UP).isPassable() || !block.getRelative(BlockFace.UP, 2).isPassable()) return;
 		Vector direction = stairs.getFacing().getDirection().multiply(0.3);
-		direction.setY(0.4);
+		direction.setY(-0.1);
 		var blockCenter = block.getLocation().toCenterLocation();
 		if(blockCenter.getWorld().getNearbyEntitiesByType(TextDisplay.class, blockCenter, 0.5).isEmpty()) {
 			event.setCancelled(true);
