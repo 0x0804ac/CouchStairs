@@ -7,45 +7,24 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.Stairs.Shape;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.AbstractArrow.PickupStatus;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 public class PluginMain extends JavaPlugin implements Listener {
-	private BukkitTask task = null;
-	
 	@Override
 	public void onEnable() {
-		task = getServer().getScheduler().runTaskTimer(this, new Runnable() {
-			public void run() {
-				for(Player player : getServer().getOnlinePlayers()) {
-					if(player.isInsideVehicle()) {
-						Entity vehicle = player.getVehicle();
-						if(vehicle.getType() == EntityType.ARROW) {
-							Arrow arrow = (Arrow) vehicle;
-							if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) arrow.setTicksLived(1);
-						}
-					}
-				}
-			}
-		}, 1111L, 1111L);
 		getServer().getPluginManager().registerEvents(this, this);
-	}
-	
-	@Override
-	public void onDisable() {
-		task.cancel();
-		task = null;
 	}
 	
 	@EventHandler
@@ -56,7 +35,7 @@ public class PluginMain extends JavaPlugin implements Listener {
 		GameMode gamemode = player.getGameMode();
 		if(gamemode != GameMode.SURVIVAL && gamemode != GameMode.CREATIVE) return;
 		if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(event.getItem() != null) return;
+		if(EquipmentSlot.HAND != event.getHand() || event.getItem() != null) return;
 		if(event.getBlockFace() == BlockFace.DOWN) return;
 		Block block = event.getClickedBlock();
 		if(!Tag.STAIRS.isTagged(block.getType())) return;
@@ -64,23 +43,18 @@ public class PluginMain extends JavaPlugin implements Listener {
 		if(stairs.getShape() != Shape.STRAIGHT || stairs.getHalf() == Half.TOP || stairs.isWaterlogged()) return;
 		if(!block.getRelative(BlockFace.UP).isPassable() || !block.getRelative(BlockFace.UP, 2).isPassable()) return;
 		Vector direction = stairs.getFacing().getDirection().multiply(0.3);
-		direction.setY(0.5);
+		direction.setY(0.4);
 		var blockCenter = block.getLocation().toCenterLocation();
-		if(blockCenter.getWorld().getNearbyEntitiesByType(Arrow.class, blockCenter, 0.5).isEmpty()) {
+		if(blockCenter.getWorld().getNearbyEntitiesByType(TextDisplay.class, blockCenter, 0.5).isEmpty()) {
 			event.setCancelled(true);
-			Arrow arrow = player.getWorld().spawnArrow(blockCenter.subtract(direction), direction, 0F, 0F);
-			arrow.setPickupStatus(PickupStatus.DISALLOWED);
-			arrow.getLocation().setDirection(direction);
-			arrow.addPassenger(player);
+			Entity mount = player.getWorld().spawnEntity(blockCenter.subtract(direction), EntityType.TEXT_DISPLAY, SpawnReason.CUSTOM);
+			mount.addPassenger(player);
 		}
 	}
 	
 	@EventHandler
 	public void despawnArrow(EntityDismountEvent event) {
 		Entity vehicle = event.getDismounted();
-		if(vehicle.getType() == EntityType.ARROW) {
-			Arrow arrow = (Arrow) vehicle;
-			if(arrow.getPickupStatus() == PickupStatus.DISALLOWED) arrow.remove();
-		}
+		if(vehicle.getType() == EntityType.TEXT_DISPLAY && vehicle.getEntitySpawnReason() == SpawnReason.CUSTOM) vehicle.remove();
 	}
 }
